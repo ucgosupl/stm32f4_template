@@ -1,0 +1,13 @@
+# eclipse workspace files
+.metadata
+RemoteSystemsTempFiles
+
+# eclipse project files
+.project
+.cproject
+
+# compilation output
+out
+
+# test reports
+test_results.txt
