@@ -4,8 +4,9 @@
  * Brief:   GPIO configuration functions.
  */
 
-#include "stm32f4xx.h"
 #include "platform_specific.h"
+#include "stm32f4xx.h"
+
 #include "gpio_f4.h"
 
 void gpio_mode_config(GPIO_TypeDef * gpio, int32_t pin, int32_t conf)
