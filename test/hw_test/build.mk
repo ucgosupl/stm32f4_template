@@ -11,19 +11,23 @@ include ../../../makefiles/funs.mk
 ###############################################################################
 # Files and paths definitions
 
-# extensions of source C and ASM files
+# extensions of source C++, C and ASM files
+CXX_EXT := cpp
 C_EXT := c
 ASM_EXT := S
 
-# searching for source C and ASM files in directories provided
+# searching for source C"", C and ASM files in directories provided
+CXX_SRCS := $(call rwildcard,$(SRC_DIRS),*.$(CXX_EXT))
 C_SRCS := $(call rwildcard,$(SRC_DIRS),*.$(C_EXT))
 ASM_SRCS := $(call rwildcard,$(SRC_DIRS),*.$(ASM_EXT))
 
 # adding single files
+CXX_SRCS += $(CXX_SRC_FILES)
 C_SRCS += $(C_SRC_FILES)
+ASM_SRCS += $(ASM_SRC_FILES)
 
 # variable storing all possible paths where dependencies could be found
-VPATH := $(sort $(dir $(C_SRCS) $(ASM_SRCS)) $(INC_DIRS))
+VPATH := $(sort $(dir $(CXX_SRCS) $(C_SRCS) $(ASM_SRCS)) $(INC_DIRS))
 
 #
 ################################################################################
@@ -40,10 +44,23 @@ CORE_FLAGS += -g
 # Hardware float support
 CORE_FLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16 -ffast-math
 
+# Compiler flags specific for C++ files
+# -std - C++ standard: c++98, gnu++98, c++11, gnu++11, c++14, gnu++14
+# -fno-rtti - disable virtual class information used by dynamic_cast and typeid
+# -fno-exceptions - disable exception handling
+# fverbose-asm - additional comments for generated assembler code
+CXX_FLAGS = -std=gnu++14 -O0 -g -fno-rtti -fno-exceptions -fverbose-asm
+
 # Compiler flags specific for C files
 # -std - C standard: c89, c99, gnu89,gnu99, iso9899:119409
 # -O0 - optimization level: -O0, -O1, -O2, -O3, -Os
-C_FLAGS := -std=gnu89 -O0 -ffunction-sections -fdata-sections
+# fverbose-asm - additional comments for generated assembler code
+C_FLAGS := -std=gnu89 -O0 -ffunction-sections -fdata-sections -fverbose-asm
+
+# Warning flags for C++
+# -Wall - standard warnings
+# -Wextra - extended warnings
+CXX_WARNINGS := -Wall -Wextra
 
 # Warning flags for C
 # -Wall - standard warnings
@@ -71,7 +88,8 @@ LIB_DIRS_F = $(patsubst %, -L%, $(LIB_DIRS))
 # Add static libs
 LIBS_F = $(patsubst %, -l%, $(LIBS))
 
-# final flags for C, ASM and linker
+# final flags for C++, C, ASM and linker
+CXX_FLAGS += $(CORE_FLAGS) $(CXX_WARNINGS) $(INC_DIRS_F)
 C_FLAGS += $(CORE_FLAGS) $(C_WARNINGS) $(INC_DIRS_F)
 ASM_FLAGS := $(CORE_FLAGS) $(INC_DIRS_F)
 LD_FLAGS += $(CORE_FLAGS) 
@@ -80,7 +98,7 @@ LD_LIBS = $(LIB_DIRS_F) $(LIBS_F)
 #
 ################################################################################
 
-###############################################################################
+################################################################################
 # Defines for output files
 
 ELF := $(OUT_DIR)bin/$(TARGET_NAME).elf
@@ -89,14 +107,15 @@ BIN := $(OUT_DIR)bin/$(TARGET_NAME).bin
 LSS := $(OUT_DIR)bin/$(TARGET_NAME).lss
 DMP := $(OUT_DIR)bin/$(TARGET_NAME).dmp
 
+CXX_OBJS := $(addprefix $(OUT_DIR), $(notdir $(CXX_SRCS:.$(CXX_EXT)=.o)))
 C_OBJS := $(addprefix $(OUT_DIR), $(notdir $(C_SRCS:.$(C_EXT)=.o)))
 ASM_OBJS := $(addprefix $(OUT_DIR), $(notdir $(ASM_SRCS:.$(ASM_EXT)=.o)))
-OBJS := $(ASM_OBJS) $(C_OBJS)
+OBJS := $(ASM_OBJS) $(C_OBJS) $(CXX_OBJS)
 
 GENERATED := $(OBJS) $(ELF) $(HEX) $(BIN) $(LSS) $(DMP)
 
 #
-###############################################################################
+################################################################################
 
 ################################################################################
 # Target list
@@ -129,7 +148,17 @@ $(LSS) : $(ELF)
 # Linking
 $(ELF) : $(OBJS)
 	$(ECHO) 'Linking target: $(ELF)'
+ifneq ($(USE_CXX), 0)
+	$(CXX) $(LD_FLAGS) $(OBJS) $(LD_LIBS) -o $@
+else
 	$(CC) $(LD_FLAGS) $(OBJS) $(LD_LIBS) -o $@
+endif
+	$(ECHO) ' '
+
+# C++ files compilation
+$(OUT_DIR)%.o : %.$(CXX_EXT)
+	$(ECHO) 'Compiling file: $<'
+	$(CXX) -c $(CXX_FLAGS) $< -o $@
 	$(ECHO) ' '
 
 # C files compilation

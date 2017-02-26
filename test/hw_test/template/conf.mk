@@ -13,6 +13,9 @@ TARGET_NAME := template
 # Directory containing compilation result.
 OUT_DIR := out/
 
+# If C++ is not used set to 0
+USE_CXX := 0
+
 # Defines passed as compiler arguments
 GLOBAL_DEFS := \
 STM32F40_41xxx \
@@ -34,9 +37,15 @@ SRC_DIRS := \
 ../../../src/hw/gpio_f4 \
 ../../../src/utils \
 
+# Additional C++ source files to compile.
+CXX_SRC_FILES := \
+./main.cpp \
+
 # Additional source files to compile.
 C_SRC_FILES := \
-./main.c \
+
+# Additional ASM source files to compile.
+ASM_SRC_FILES := \
 
 # Paths to the precompiled libraries (.a).
 LIB_DIRS := \
