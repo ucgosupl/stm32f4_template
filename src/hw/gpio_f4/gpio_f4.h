@@ -7,6 +7,10 @@
 #ifndef _GPIO_F4_H_
 #define _GPIO_F4_H_
 
+#ifdef __cplusplus
+ extern "C" {
+#endif /* __cplusplus */
+
 /**
  * @defgroup hw_gpio
  * @{
@@ -181,5 +185,9 @@ void gpio_af_config(GPIO_TypeDef * gpio, int32_t pin, int32_t conf);
 /**
  * @}
  */
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* _GPIO_F4_H_ */

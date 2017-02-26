@@ -7,6 +7,7 @@
 TOOLCHAIN := arm-none-eabi-
 
 CC := $(TOOLCHAIN)gcc
+CXX := $(TOOLCHAIN)g++
 AS := $(TOOLCHAIN)gcc -x assembler-with-cpp
 OBJCOPY := $(TOOLCHAIN)objcopy
 OBJDUMP := $(TOOLCHAIN)objdump
