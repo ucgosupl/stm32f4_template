@@ -24,6 +24,8 @@ TEST_OBJ := $(addprefix $(OUT_DIR)test/, $(sort $(notdir $(TEST_SRC:.$(C_EXT)=.o
 
 OBJS := $(CODE_OBJ) $(TEST_OBJ)
 
+DEPS := $(OBJS:.o=.d)
+
 VPATH := $(sort $(dir $(TEST_SRC) $(CODE_SRC)) $(TEST_INC_DIRS))
 #
 ###############################################################################
@@ -32,9 +34,9 @@ VPATH := $(sort $(dir $(TEST_SRC) $(CODE_SRC)) $(TEST_INC_DIRS))
 # Compiler and linker defines
 
 # Code under tests is compiled with extended warning flags
-C_FLAGS_CODE := -Wall -Wextra -Wstrict-prototypes
+C_FLAGS_CODE := -Wall -Wextra -Wstrict-prototypes -MMD
 # Test files are compiled with only standard flags set
-C_FLAGS_TEST := -Wall
+C_FLAGS_TEST := -Wall -MMD
 
 # Include paths
 INC_FLAGS_CODE := $(patsubst %, -I%, $(INC_DIRS))
@@ -86,6 +88,9 @@ $(OUT_DIR)test/%.o : %.$(C_EXT)
 	@echo 'Compiling file: $<'
 	$(CC) -c $(C_FLAGS_TEST) $< -o $@
 	@echo ''
+
+# header dependencies
+-include $(DEPS)
 
 out_dir :
 	@mkdir -p $(OUT_DIR)bin

@@ -44,6 +44,9 @@ CORE_FLAGS += -g
 # Hardware float support
 CORE_FLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16 -ffast-math
 
+# Create dependency files
+CORE_FLAGS += -MMD
+
 # Compiler flags specific for C++ files
 # -std - C++ standard: c++98, gnu++98, c++11, gnu++11, c++14, gnu++14
 # -fno-rtti - disable virtual class information used by dynamic_cast and typeid
@@ -111,6 +114,7 @@ CXX_OBJS := $(addprefix $(OUT_DIR), $(notdir $(CXX_SRCS:.$(CXX_EXT)=.o)))
 C_OBJS := $(addprefix $(OUT_DIR), $(notdir $(C_SRCS:.$(C_EXT)=.o)))
 ASM_OBJS := $(addprefix $(OUT_DIR), $(notdir $(ASM_SRCS:.$(ASM_EXT)=.o)))
 OBJS := $(ASM_OBJS) $(C_OBJS) $(CXX_OBJS)
+DEPS := $(OBJS:.o=.d)
 
 GENERATED := $(OBJS) $(ELF) $(HEX) $(BIN) $(LSS) $(DMP)
 
@@ -172,6 +176,9 @@ $(OUT_DIR)%.o : %.$(ASM_EXT)
 	$(ECHO) 'Assembling file: $<'
 	$(AS) -c $(ASM_FLAGS) $< -o $@
 	$(ECHO) ' '
+
+# header dependencies
+-include $(DEPS)
 
 make_out_dir :
 	$(ECHO) $(OBJS)
