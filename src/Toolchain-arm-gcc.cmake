@@ -19,6 +19,9 @@ set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 # Don't know if following setting works also for Ninja
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
+# Remove default static libraries for win32
+set(CMAKE_C_STANDARD_LIBRARIES "")
+
 macro(add_arm_executable target_name)
 
 # Output files
@@ -86,3 +89,9 @@ set_target_properties(
 )
 
 endmacro(add_arm_executable)
+
+macro(arm_link_libraries target_name)
+
+target_link_libraries(${target_name}.elf ${ARGN})
+
+endmacro(arm_link_libraries)

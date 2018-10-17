@@ -35,6 +35,14 @@ set(GLOBAL_DEFINES
     -DSTM32F40_41xxx
 )
 
+set(LINKED_LIBS
+
+)
+
+link_directories(
+
+)
+
 include_directories(${INCLUDE_DIRS})
 add_definitions(${GLOBAL_DEFINES})
 
@@ -86,14 +94,9 @@ set(LD_FLAGS "-Wl,-Map=${PROJECT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.map,--cref -T
 set(CMAKE_CXX_FLAGS "${CORE_FLAGS} ${CXX_FLAGS} ${CXX_WARNINGS}")
 set(CMAKE_C_FLAGS "${CORE_FLAGS} ${C_FLAGS} ${C_WARNINGS}")
 set(CMAKE_ASM_FLAGS "${ASM_FLAGS} ${CORE_FLAGS} ${CXX_WARNINGS}")
-set(CMAKE_LD_FLAGS "${CORE_FLAGS} ${LD_FLAGS}")
-
-# Remove default static libraries for win32
-set(CMAKE_C_STANDARD_LIBRARIES "")
-# Used for linker flags instead of libraries
-link_libraries(${CMAKE_LD_FLAGS})
+set(CMAKE_EXE_LINKER_FLAGS "${CORE_FLAGS} ${LD_FLAGS}")
 
 # generate elf file
 add_arm_executable(${CMAKE_PROJECT_NAME} ${CPP_SRCS} ${C_SRCS} ${ASM_SRCS})
 
-# static libraries and lib directories
+arm_link_libraries(${CMAKE_PROJECT_NAME} ${LINKED_LIBS})
